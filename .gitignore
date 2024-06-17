@@ -1,0 +1,70 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.vscode/
+
+# Vite
+dist/
+.vite/
+
+# Logs
+logs/
+*.log
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Backend
+backend/node_modules/
+backend/logs/
+backend/dist/
+backend/.env
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+
+# Machine Learning
+machine-learning/__pycache__/
+machine-learning/*.pyc
+machine-learning/*.pyo
+machine-learning/env/
+machine-learning/.env
+
+# AWS
+infra/.terraform/
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+infra/.env
+
+# Miscellaneous
+.DS_Store
+.env
+*.env
+*.local
+.swp
+.idea/
+.project
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Usage
+Running the Application
+Ensure MongoDB is running.
+Start the backend server.
+Start the frontend development server.
+Access the application at http://localhost:3000.
+
+# Deploying to AWS
+Use Terraform to set up the infrastructure in AWS.
+Use the Serverless Framework to deploy backend functions.
+Deploy the frontend to AWS S3 and configure CloudFront.
