@@ -56,13 +56,11 @@ infra/.env
 *.iml
 *.sublime-project
 *.sublime-workspace
+about.txt
 
-# Usage
-Running the Application
-Ensure MongoDB is running.
-Start the backend server.
-Start the frontend development server.
-Access the application at http://localhost:3000.
+
+# ignore test files
+**/src/tests/
 
 # Deploying to AWS
 Use Terraform to set up the infrastructure in AWS.
