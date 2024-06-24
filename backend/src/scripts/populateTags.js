@@ -1,5 +1,6 @@
 // src/scripts/populateTags.js
 
+const mongoose = require("mongoose");
 const Tag = require("../models/Tag");
 const connectDB = require("../utils/database");
 
@@ -52,26 +53,37 @@ const tags = [
   "Academic",
   "Technical",
   "Informal",
-  "Comedy"
+  "Comedy",
 ];
 
 // Connect to the database
 connectDB();
 
-// Loop through the list of tags
-tags.forEach((tag) => {
-  // Find the Tag and update it if it exists, otherwise create a new Tag
-  Tag.findOneAndUpdate(
-    { name: tag }, // filter
-    { name: tag }, // document to insert when nothing was found
-    { upsert: true, new: true, runValidators: true }, // options
-    (err, doc) => {
-      // callback
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(`Upserted tag: ${doc.name}`);
-      }
-    }
-  );
-});
+// Function to upsert tags
+async function upsertTags() {
+  try {
+    const promises = tags.map(tag => {
+      return Tag.findOneAndUpdate(
+        { name: tag }, // filter
+        { name: tag }, // document to insert when nothing was found
+        { upsert: true, new: true, runValidators: true } // options
+      );
+    });
+
+    // Wait for all the findOneAndUpdate operations to complete
+    const results = await Promise.all(promises);
+    console.log(`Upserted ${results.length} tags.`);
+
+    // Disconnect from the database
+    await mongoose.disconnect();
+    console.log('Disconnected from database.');
+  } catch (err) {
+    console.error(err);
+    // Ensure disconnection in case of error as well
+    await mongoose.disconnect();
+    console.log('Disconnected from database due to error.');
+  }
+}
+
+// Execute the upsertTags function
+upsertTags();

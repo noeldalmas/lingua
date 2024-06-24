@@ -1,5 +1,7 @@
 // src/models/Course.js
 const mongoose = require("mongoose");
+const LanguagesEnum = require("../utils/enums/LanguagesEnum");
+const fileSchema = require("./FileSchema");
 
 const courseSchema = new mongoose.Schema(
   {
@@ -15,9 +17,18 @@ const courseSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
-    language: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Language",
+    offeredInLanguages: {
+      type: [
+        {
+          type: String,
+          enum: Object.values(LanguagesEnum),
+        },
+      ],
+      required: true,
+    },
+    teachesLanguage: {
+      type: String,
+      enum: Object.values(LanguagesEnum),
       required: true,
     },
     lessons: [
@@ -32,6 +43,7 @@ const courseSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    files: [fileSchema],
   },
   {
     timestamps: true, // This will automatically create and update `createdAt` and `updatedAt`

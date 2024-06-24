@@ -1,7 +1,7 @@
 const userService = require("../services/userService");
 const { generateToken } = require("../utils/auth");
 
-const registerUser = async (req, res) => {
+const registerUser = async (req, res, next) => {
   const userData = req.body;
 
   try {
@@ -23,14 +23,11 @@ const registerUser = async (req, res) => {
       token: generateToken(user),
     });
   } catch (error) {
-    console.error("Error registering user:", error);
-    res
-      .status(500)
-      .json({ message: error.message || "Error registering user" });
+    next(error); // Pass the error to the next middleware
   }
 };
 
-const loginUser = async (req, res) => {
+const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
@@ -43,12 +40,11 @@ const loginUser = async (req, res) => {
       token,
     });
   } catch (error) {
-    console.error("Error logging in user:", error);
-    res.status(500).json({ message: error.message || "Error logging in user" });
+    next(error); // Pass the error to the next middleware
   }
 };
 
-const getUserProfile = async (req, res) => {
+const getUserProfile = async (req, res, next) => {
   try {
     const user = await userService.findUserById(req.user.id);
 
@@ -58,15 +54,11 @@ const getUserProfile = async (req, res) => {
 
     res.status(200).json(user);
   } catch (error) {
-    console.error("Error fetching user profile:", error);
-    res
-      .status(500)
-      .json({ message: error.message || "Error fetching user profile" });
+    next(error); // Pass the error to the next middleware
   }
 };
 
-// User update their own profile
-const updateUserProfile = async (req, res) => {
+const updateUserProfile = async (req, res, next) => {
   try {
     const user = await userService.findUserById(req.user.id);
 
@@ -74,7 +66,6 @@ const updateUserProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Exclude role from the request body
     const { role, ...updateData } = req.body;
 
     Object.assign(user, updateData);
@@ -91,15 +82,11 @@ const updateUserProfile = async (req, res) => {
       token: generateToken(updatedUser),
     });
   } catch (error) {
-    console.error("Error updating user profile:", error);
-    res
-      .status(500)
-      .json({ message: error.message || "Error updating user profile" });
+    next(error); // Pass the error to the next middleware
   }
 };
 
-// Admin update user
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   try {
     const user = await userService.findUserById(req.params.id);
 
@@ -113,13 +100,11 @@ const updateUser = async (req, res) => {
 
     res.json(updatedUser);
   } catch (error) {
-    console.error("Error updating user:", error);
-    res.status(500).json({ message: error.message || "Error updating user" });
+    next(error); // Pass the error to the next middleware
   }
 };
 
-// Admin delete user
-const deleteUser = async (req, res) => {
+const deleteUser = async (req, res, next) => {
   try {
     const user = await userService.findUserById(req.params.id);
 
@@ -137,21 +122,17 @@ const deleteUser = async (req, res) => {
 
     res.status(200).json({ message: "User deleted" });
   } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ message: error.message || "Error deleting user" });
+    next(error); // Pass the error to the next middleware
   }
 };
 
-const getAllUsers = async (req, res) => {
+const getAllUsers = async (req, res, next) => {
   try {
     const users = await userService.getAllUsers();
 
     res.status(200).json(users);
   } catch (error) {
-    console.error("Error fetching all users:", error);
-    res
-      .status(500)
-      .json({ message: error.message || "Error fetching all users" });
+    next(error); // Pass the error to the next middleware
   }
 };
 

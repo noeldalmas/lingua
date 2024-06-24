@@ -1,16 +1,12 @@
 // src/models/Lesson.js
 const mongoose = require("mongoose");
+const LanguagesEnum = require("../utils/enums/LanguagesEnum");
 
 // Import the Tag model
 const Tag = require("./Tag");
 
-// Define the schema for a file
-const fileSchema = new mongoose.Schema({
-  name: String,
-  type: String,
-  format: String,
-  url: String, // URL of the file in AWS
-});
+// Import the schema for a file
+const fileSchema = require("./FileSchema");
 
 // Define the schema for a lesson
 const lessonSchema = new mongoose.Schema(
@@ -27,9 +23,9 @@ const lessonSchema = new mongoose.Schema(
       ref: "Course", // Reference to the Course model
       required: false, // Some lessons may not be associated with any course
     },
-    language: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Language",
+    offeredInWhichLanguage: {
+      type: String,
+      enum: Object.values(LanguagesEnum),
       required: true,
     },
     quizzes: [

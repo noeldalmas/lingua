@@ -9,11 +9,17 @@ const notFound = (req, res, next) => {
 
 // Middleware to handle all errors
 const errorHandler = (err, req, res, next) => {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  // Determine the status code: Use the existing status code or default to 500
+  const statusCode = res.statusCode !== 200 ? res.statusCode : 500;
   res.status(statusCode);
+
+  // Send a detailed error response
   res.json({
-    message: err.message,
-    stack: process.env.NODE_ENV === "production" ? null : err.stack,
+    status: "error",
+    statusCode: statusCode,
+    message: err.message, // Ensure the error message is passed
+    // Include the stack trace in non-production environments for debugging
+    stack: process.env.NODE_ENV === "production" ? "🥞" : err.stack,
   });
 };
 
