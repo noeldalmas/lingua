@@ -1,4 +1,5 @@
 // src/models/Lesson.js
+const mongoose = require("mongoose");
 
 // Import the Tag model
 const Tag = require("./Tag");
@@ -25,6 +26,11 @@ const lessonSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course", // Reference to the Course model
       required: false, // Some lessons may not be associated with any course
+    },
+    language: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Language",
+      required: true,
     },
     quizzes: [
       {

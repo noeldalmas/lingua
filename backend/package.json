@@ -6,7 +6,8 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "test": "jest",
-    "populateTags": "node src/scripts/populateTags.js"
+    "populateTags": "node src/scripts/populateTags.js",
+    "populateLanguages": "node src/scripts/populateLanguages.js"
   },
   "jest": {
     "testEnvironment": "node",

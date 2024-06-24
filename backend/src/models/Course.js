@@ -1,3 +1,4 @@
+// src/models/Course.js
 const mongoose = require("mongoose");
 
 const courseSchema = new mongoose.Schema(
@@ -15,8 +16,8 @@ const courseSchema = new mongoose.Schema(
       required: true,
     },
     language: {
-      type: String,
-      enum: ["swahili", "luhya", "luo", "gikuyu", "kalenjin"],
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Language",
       required: true,
     },
     lessons: [

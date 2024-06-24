@@ -1,4 +1,5 @@
 const lessonService = require("../services/lessonService");
+const { protect, isLessonCreator, teacherOrAdmin } = require("../utils/auth");
 
 // Create a new lesson
 const createLesson = async (req, res) => {
@@ -17,6 +18,17 @@ const createLesson = async (req, res) => {
   }
 };
 
+// Get all lessons
+const getAllLessons = async (req, res) => {
+  try {
+    const lessons = await lessonService.getAllLessons();
+    res.status(200).json(lessons);
+  } catch (error) {
+    console.error("Error fetching all lessons:", error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // Get lessons by course ID
 const getLessonsByCourseId = async (req, res) => {
   try {
@@ -31,42 +43,62 @@ const getLessonsByCourseId = async (req, res) => {
 };
 
 // Update a lesson
-const updateLesson = async (req, res) => {
-  try {
-    const lesson = await lessonService.getLessonById(req.params.id);
-    if (!lesson) {
-      return res.status(404).json({ message: "Lesson not found" });
+const updateLesson = [
+  protect,
+  isLessonCreator,
+  teacherOrAdmin,
+  async (req, res) => {
+    try {
+      const lesson = await lessonService.getLessonById(req.params.id);
+      if (!lesson) {
+        return res.status(404).json({ message: "Lesson not found" });
+      }
+      const lessonData = {
+        ...req.body,
+        updatedBy: req.user.id,
+        verified:
+          (req.user.role === "teacher" || req.user.role === "admin") &&
+          lesson.createdBy.toString() !== req.user.id.toString(),
+        verifiedBy:
+          (req.user.role === "teacher" || req.user.role === "admin") &&
+          lesson.createdBy.toString() !== req.user.id.toString()
+            ? req.user.id
+            : null,
+      };
+      const updatedLesson = await lessonService.updateLesson(
+        req.params.id,
+        lessonData
+      );
+      res.status(200).json(updatedLesson);
+    } catch (error) {
+      console.error("Error updating lesson:", error.message);
+      res.status(500).json({ message: error.message });
     }
-    const lessonData = {
-      ...req.body,
-      updatedBy: req.user.id,
-      verified: (req.user.role === 'teacher' || req.user.role === 'admin') && lesson.createdBy.toString() !== req.user.id.toString(),
-      verifiedBy: (req.user.role === 'teacher' || req.user.role === 'admin') && lesson.createdBy.toString() !== req.user.id.toString() ? req.user.id : null,
-    };
-    const updatedLesson = await lessonService.updateLesson(req.params.id, lessonData);
-    res.status(200).json(updatedLesson);
-  } catch (error) {
-    console.error("Error updating lesson:", error.message);
-    res.status(500).json({ message: error.message });
-  }
-};
+  },
+];
 
 // Delete a lesson
-const deleteLesson = async (req, res) => {
-  try {
-    const lesson = await lessonService.deleteLesson(req.params.id);
-    if (!lesson) {
-      return res.status(404).json({ message: "Lesson not found" });
+const deleteLesson = [
+  protect,
+  isLessonCreator,
+  teacherOrAdmin,
+  async (req, res) => {
+    try {
+      const lesson = await lessonService.deleteLesson(req.params.id);
+      if (!lesson) {
+        return res.status(404).json({ message: "Lesson not found" });
+      }
+      res.status(200).json(lesson);
+    } catch (error) {
+      console.error("Error deleting lesson:", error.message);
+      res.status(500).json({ message: error.message });
     }
-    res.status(200).json(lesson);
-  } catch (error) {
-    console.error("Error deleting lesson:", error.message);
-    res.status(500).json({ message: error.message });
-  }
-};
+  },
+];
 
 module.exports = {
   createLesson,
+  getAllLessons,
   getLessonsByCourseId,
   updateLesson,
   deleteLesson,

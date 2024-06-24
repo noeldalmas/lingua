@@ -21,6 +21,11 @@ const createLesson = async (lessonData) => {
   }
 };
 
+// Service to get all lessons
+const getAllLessons = async () => {
+  return Lesson.find({});
+};
+
 // Service to get lessons by course ID
 const getLessonsByCourseId = async (courseId) => {
   try {
@@ -65,6 +70,7 @@ const deleteLesson = async (lessonId) => {
 
 module.exports = {
   createLesson,
+  getAllLessons,
   getLessonsByCourseId,
   updateLesson,
   deleteLesson,

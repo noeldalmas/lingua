@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const dotenv = require("dotenv");
 const courseService = require("../services/courseService");
+const lessonService = require("../services/lessonService");
 
 dotenv.config();
 
