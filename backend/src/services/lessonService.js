@@ -3,22 +3,18 @@ const Course = require("../models/Course");
 
 // Service to create a new lesson
 const createLesson = async (lessonData) => {
-  try {
-    const course = await Course.findById(lessonData.course);
-    if (!course) {
-      throw new Error("Course not found");
-    }
-
-    const lesson = new Lesson(lessonData);
-    await lesson.save();
-
-    course.lessons.push(lesson._id);
-    await course.save();
-
-    return lesson;
-  } catch (error) {
-    throw new Error(`Error creating lesson: ${error.message}`);
+  const course = await Course.findById(lessonData.course);
+  if (!course) {
+    return { error: "Course not found" };
   }
+
+  const lesson = new Lesson(lessonData);
+  await lesson.save();
+
+  course.lessons.push(lesson._id);
+  await course.save();
+
+  return { data: lesson };
 };
 
 // Service to get all lessons
@@ -28,43 +24,59 @@ const getAllLessons = async () => {
 
 // Service to get lessons by course ID
 const getLessonsByCourseId = async (courseId) => {
-  try {
-    return Lesson.find({ course: courseId });
-  } catch (error) {
-    throw new Error(`Error fetching lessons: ${error.message}`);
+  const lessons = await Lesson.find({ course: courseId });
+  return { data: lessons };
+};
+
+// Service to get a lesson by ID
+const getLessonById = async (lessonId) => {
+  const lesson = await Lesson.findById(lessonId);
+  if (!lesson) {
+    return { error: "Lesson not found" };
   }
+  return { data: lesson };
 };
 
 // Service to update a lesson
 const updateLesson = async (lessonId, lessonData) => {
-  try {
-    const lesson = await Lesson.findByIdAndUpdate(lessonId, lessonData, {
-      new: true,
-    });
-    if (!lesson) {
-      throw new Error("Lesson not found");
-    }
-    return lesson;
-  } catch (error) {
-    throw new Error(`Error updating lesson: ${error.message}`);
+  const lesson = await Lesson.findById(lessonId);
+  if (!lesson) {
+    return { error: "Lesson not found" };
   }
+
+  const updatedLesson = await Lesson.findByIdAndUpdate(lessonId, lessonData, {
+    new: true,
+  });
+  return { data: updatedLesson };
 };
 
 // Service to delete a lesson
 const deleteLesson = async (lessonId) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
-    const lesson = await Lesson.findByIdAndDelete(lessonId);
+    const lesson = await Lesson.findById(lessonId).session(session);
     if (!lesson) {
-      throw new Error("Lesson not found");
+      await session.abortTransaction();
+      session.endSession();
+      return { error: "Lesson not found" };
     }
-    const course = await Course.findById(lesson.course);
+
+    await Lesson.findByIdAndDelete(lessonId).session(session);
+
+    const course = await Course.findById(lesson.course).session(session);
     if (course) {
       course.lessons.pull(lesson._id);
-      await course.save();
+      await course.save({ session });
     }
-    return lesson;
+
+    await session.commitTransaction();
+    session.endSession();
+    return { data: lesson };
   } catch (error) {
-    throw new Error(`Error deleting lesson: ${error.message}`);
+    await session.abortTransaction();
+    session.endSession();
+    throw error; // Or return an error object/message
   }
 };
 
@@ -74,4 +86,5 @@ module.exports = {
   getLessonsByCourseId,
   updateLesson,
   deleteLesson,
+  getLessonById,
 };

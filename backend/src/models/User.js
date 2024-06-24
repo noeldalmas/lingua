@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { Schema } = mongoose;
+
 
 const userPreferencesSchema = new mongoose.Schema(
   {
@@ -9,24 +11,7 @@ const userPreferencesSchema = new mongoose.Schema(
       default: [],
     },
     preferredGenres: {
-      type: [String],
-      enum: [
-        "Grammar",
-        "Vocabulary",
-        "Listening Comprehension",
-        "Reading Comprehension",
-        "Speaking Practice",
-        "Culture",
-        "Exercises and Quizzes",
-        "Business",
-        "Travel",
-        "News",
-        "Entertainment",
-        "Literature",
-        "Academic",
-        "Technical",
-        "Slang and Informal",
-      ],
+      type: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
       default: [],
     },
     level: {

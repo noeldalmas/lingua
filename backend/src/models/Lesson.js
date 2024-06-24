@@ -51,7 +51,8 @@ const lessonSchema = new mongoose.Schema(
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User", // Reference to the User model
+      ref: "User",
+      required: true,
     },
     updatedBy: {
       type: mongoose.Schema.Types.ObjectId,
