@@ -1,5 +1,3 @@
-// src/routes/aggregatorRoutes.js
-
 const express = require("express");
 const {
   createAggregatedContent,

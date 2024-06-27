@@ -1,33 +1,39 @@
-// src/models/AggregatedContent.js
-
-// Import mongoose for creating the schema
 const mongoose = require("mongoose");
 
-// Define the schema for aggregated content
-const aggregatedContentSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true, // Title is required
-  },
-  description: {
-    type: String,
-  },
-  sourceUrl: {
-    type: String,
-    required: true, // Source URL is required
-  },
-  contentType: {
-    type: String,
-    enum: ["video", "article", "audio"], // Content type must be one of these values
-    required: true,
-  },
-  tags: [String], // Array of tags for categorization
-  categories: [String], // Array of categories
-  fetchTimestamp: {
-    type: Date,
-    default: Date.now, // Automatically set the fetch timestamp
-  },
+const thumbnailSchema = new mongoose.Schema({
+  url: String,
+  width: Number,
+  height: Number,
 });
 
-// Export the model for use in other parts of the application
-module.exports = mongoose.model("AggregatedContent", aggregatedContentSchema);
+const aggregatedContentSchema = new mongoose.Schema(
+  {
+    kind: { type: String, required: true },
+    etag: { type: String, required: true },
+    videoId: { type: String, required: true, unique: true },
+    channelId: { type: String, required: true },
+    playlistId: { type: String },
+    publishedAt: { type: Date, required: true },
+    channelTitle: { type: String, required: true },
+    title: { type: String, required: true },
+    description: { type: String, required: true },
+    thumbnails: {
+      default: thumbnailSchema,
+      medium: thumbnailSchema,
+      high: thumbnailSchema,
+      standard: thumbnailSchema,
+      maxres: thumbnailSchema,
+    },
+    liveBroadcastContent: { type: String, required: true },
+    tags: { type: [String], required: false },
+    language: { type: String, required: true },
+  },
+  { timestamps: true }
+);
+
+const AggregatedContent = mongoose.model(
+  "AggregatedContent",
+  aggregatedContentSchema
+);
+
+module.exports = AggregatedContent;

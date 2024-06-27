@@ -1,24 +1,30 @@
-// src/controllers/aggregatorController.js
+const AggregatorService = require("../services/aggregatorService");
 
-const aggregatorService = require("../services/aggregatorService");
+const createAggregatedContent = async (req, res, next) => {
+  const { language } = req.body;
 
-// Create a new aggregated content
-const createAggregatedContent = async (req, res) => {
   try {
-    const content = await aggregatorService.createAggregatedContent(req.body);
-    res.status(201).json(content);
+    const videos = await AggregatorService.fetchYouTubeData(language);
+    for (const video of videos) {
+      await AggregatorService.enrichVideoWithKeyPhrases(video);
+    }
+    await AggregatorService.saveToMongoDB(videos);
+    const savedVideos = await AggregatorService.getAggregatedContent();
+    res.status(200).send({
+      message: "Content fetched, enriched, and saved successfully",
+      data: savedVideos,
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
-// Get all aggregated content
-const getAggregatedContent = async (req, res) => {
+const getAggregatedContent = async (req, res, next) => {
   try {
-    const content = await aggregatorService.getAggregatedContent();
-    res.status(200).json(content);
+    const content = await AggregatorService.getAggregatedContent();
+    res.status(200).send(content);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    next(error);
   }
 };
 
