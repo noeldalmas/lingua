@@ -34,7 +34,7 @@ const authenticateUser = async (email, password) => {
     throw new Error("Invalid credentials");
   }
 
-  const token = generateToken(user._id);
+  const token = generateToken({ _id: user._id, role: user.role });
   return { user, token };
 };
 

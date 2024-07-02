@@ -1,0 +1,27 @@
+/* src/styles/ProgressDetail.css */
+.progress-detail {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.progress-detail h2 {
+  margin-bottom: 1.5rem;
+}
+
+.progress-detail ul {
+  list-style: none;
+  padding: 0;
+}
+
+.progress-detail ul li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f4f4f4;
+}
+
+.progress-detail ul li span {
+  display: block;
+}

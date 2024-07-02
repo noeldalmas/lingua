@@ -9,6 +9,7 @@ const quizRoutes = require("./src/routes/quizRoutes");
 const forumRoutes = require("./src/routes/forumRoutes");
 const aggregatorRoutes = require("./src/routes/aggregatorRoutes");
 const { notFound, errorHandler } = require("./src/middleware/errorMiddleware");
+const cors = require("cors");
 
 dotenv.config();
 
@@ -19,6 +20,9 @@ connectDB();
 
 // Middleware to parse JSON
 app.use(express.json());
+
+// Enable CORS
+app.use(cors());
 
 // Root route
 app.get("/", (req, res) => {

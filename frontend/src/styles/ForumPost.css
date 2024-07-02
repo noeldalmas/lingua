@@ -1,0 +1,16 @@
+/* src/styles/ForumPost.css */
+.forum-post {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.forum-post h3 {
+  margin-bottom: 1rem;
+}
+
+.forum-post p {
+  margin: 0;
+}

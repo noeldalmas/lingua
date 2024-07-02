@@ -1,0 +1,15 @@
+/* src/styles/LessonDetail.css */
+.lesson-detail {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.lesson-detail h1 {
+  margin-bottom: 1rem;
+}
+
+.lesson-detail div {
+  line-height: 1.6;
+}

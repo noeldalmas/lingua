@@ -3,6 +3,7 @@ const { generateToken } = require("../utils/auth");
 
 const registerUser = async (req, res, next) => {
   const userData = req.body;
+  userData.role = "student";
 
   try {
     const existingUser = await userService.findUserByEmail(userData.email);
@@ -37,6 +38,7 @@ const loginUser = async (req, res, next) => {
       _id: user._id,
       name: user.name,
       email: user.email,
+      role: user.role,
       token,
     });
   } catch (error) {

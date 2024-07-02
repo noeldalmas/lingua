@@ -1,0 +1,23 @@
+/* src/styles/UserManagement.css */
+.user-management {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.user-management h2 {
+  margin-bottom: 1rem;
+}
+
+.user-management table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.user-management table th,
+.user-management table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #f4f4f4;
+}

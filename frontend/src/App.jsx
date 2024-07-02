@@ -1,35 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.jsx
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom"; // Updated import
+import { Provider } from "react-redux";
+import store from "./redux/store";
 
-function App() {
-  const [count, setCount] = useState(0)
+import LandingPage from "./pages/LandingPage";
+import SignUpPage from "./pages/SignUpPage";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import CourseListingPage from "./pages/CourseListingPage";
+import CourseDetailPage from "./pages/CourseDetailPage";
+import LessonPage from "./pages/LessonPage";
+import QuizPage from "./pages/QuizPage";
+import ProgressTrackingPage from "./pages/ProgressTrackingPage";
+import CommunityForumPage from "./pages/CommunityForumPage";
+import ProfilePage from "./pages/ProfilePage";
+import PasswordResetPage from "./pages/PasswordResetPage";
+import TermsOfServicePage from "./pages/TermsOfServicePage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import HelpPage from "./pages/HelpPage";
+import ContactUsPage from "./pages/ContactUsPage";
 
+import Header from "./components/Common/Header";
+import Footer from "./components/Common/Footer";
+import Sidebar from "./components/Common/Sidebar";
+
+import "./styles/main.css";
+
+const App = () => {
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Provider store={store}>
+      <Router>
+        <div className="app">
+          <Header />
+          <div className="main-content">
+            <Sidebar />
+            <div className="content">
+              <Routes>
+                {" "}
+                {/* Updated component */}
+                <Route path="/" element={<LandingPage />} exact />
+                <Route path="/signup" element={<SignUpPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/courses" element={<CourseListingPage />} exact />
+                <Route path="/courses/:id" element={<CourseDetailPage />} />
+                <Route path="/lessons/:id" element={<LessonPage />} />
+                <Route path="/quizzes/:id" element={<QuizPage />} />
+                <Route path="/progress" element={<ProgressTrackingPage />} />
+                <Route path="/forum" element={<CommunityForumPage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/reset-password" element={<PasswordResetPage />} />
+                <Route path="/terms" element={<TermsOfServicePage />} />
+                <Route path="/privacy" element={<PrivacyPolicyPage />} />
+                <Route path="/help" element={<HelpPage />} />
+                <Route path="/contact" element={<ContactUsPage />} />
+              </Routes>
+            </div>
+          </div>
+          <Footer />
+        </div>
+      </Router>
+    </Provider>
+  );
+};
 
-export default App
+export default App;
