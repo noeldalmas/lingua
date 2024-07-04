@@ -9,9 +9,6 @@ const LandingPage = () => {
       <header className="landing-header">
         <h1>Welcome to Lingua</h1>
         <p>Your platform for learning African languages</p>
-        <Link to="/signup" className="cta-button">
-          Get Started
-        </Link>
       </header>
       <section className="features">
         <h2>Features</h2>

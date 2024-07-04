@@ -1,40 +1,51 @@
-// src/components/Common/Header.jsx
-import React from "react";
-import { Link } from "react-router-dom";
-import Logout from "../Auth/Logout";
-import { useSelector } from "react-redux";
+import { NavLink } from "react-router-dom";
+import { useLogout } from "../../hooks/useLogout";
+import Button from "./Button";
+import { useAuthContext } from "../../hooks/useAuthContext";
 import "../../styles/Header.css";
 
-const Header = () => {
-  const user = useSelector((state) => state.auth.user);
+function Header() {
+  const { logout } = useLogout();
+  const { user } = useAuthContext();
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <header className="header">
       <div className="header-container">
-        <div className="logo">
-          <Link to="/">Lingua</Link>
-        </div>
+        <NavLink to="/">
+          <img src="logo.png" alt="logo" className="logo-img" />
+        </NavLink>
         <nav className="nav-links">
-          <Link to="/about">About</Link>
-          <Link to="/courses">Courses</Link>
-          <Link to="/community">Community</Link>
-          <Link to="/contact">Contact</Link>
+          <ul>
+            {!user && (
+              <>
+                <NavLink to="/contact">Contact</NavLink>
+                <NavLink to="/about">About</NavLink>
+              </>
+            )}
+            {user && (
+              <>
+                <li>
+                  <span>{user.email} </span>
+                  <Button onClick={handleLogout} label="Log out" />
+                </li>
+              </>
+            )}
+            {!user && (
+              <li>
+                <NavLink to="/auth">
+                  <Button label="Login / Register" />
+                </NavLink>
+              </li>
+            )}
+          </ul>
         </nav>
-        {/* Conditionally render auth links or logout based on user state */}
-        {user ? (
-          <div className="auth-links">
-            <Logout />
-          </div>
-        ) : (
-          <div className="auth-links">
-            <Link to="/login">Login</Link>
-            <Link to="/signup">Sign Up</Link>
-          </div>
-        )}
-        <Logout />
       </div>
     </header>
   );
-};
+}
 
 export default Header;

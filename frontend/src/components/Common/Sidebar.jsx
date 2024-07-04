@@ -1,19 +1,35 @@
 // src/components/Common/Sidebar.jsx
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import "../../styles/main.css";
 
-const Sidebar = () => {
+const Sidebar = ({ onItemSelected }) => {
+  const [selectedItem, setSelectedItem] = useState("Dashboard");
+
+  const handleItemClick = (item) => {
+    setSelectedItem(item);
+    onItemSelected(item);
+  };
+
   return (
     <aside className="sidebar">
-      <nav className="sidebar-nav">
-        <Link to="/dashboard">Dashboard</Link>
-        <Link to="/courses">Courses</Link>
-        <Link to="/lessons">Lessons</Link>
-        <Link to="/quizzes">Quizzes</Link>
-        <Link to="/profile">Profile</Link>
-        <Link to="/community">Community</Link>
-      </nav>
+      <ul>
+        {[
+          "Dashboard",
+          "Courses",
+          "Lessons",
+          "Quizzes",
+          "Community",
+          "Profile",
+        ].map((item) => (
+          <li
+            key={item}
+            className={selectedItem === item ? "selected" : ""}
+            onClick={() => handleItemClick(item)}
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
     </aside>
   );
 };
