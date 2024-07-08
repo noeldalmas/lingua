@@ -9,6 +9,7 @@ const {
   updateUser,
   deleteUser,
   getAllUsers,
+  getAllUsersDataForML,
 } = require("../controllers/userController");
 const { protect, admin } = require("../utils/auth");
 
@@ -36,5 +37,8 @@ router
   .route("/:id")
   .patch(protect, admin, updateUser)
   .delete(protect, admin, deleteUser);
+
+// Get all users for python app
+router.route("/allUserData").get(getAllUsersDataForML);
 
 module.exports = router;

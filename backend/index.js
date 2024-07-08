@@ -5,9 +5,9 @@ const connectDB = require("./src/utils/database");
 const userRoutes = require("./src/routes/userRoutes");
 const courseRoutes = require("./src/routes/courseRoutes");
 const lessonRoutes = require("./src/routes/lessonRoutes");
-const quizRoutes = require("./src/routes/quizRoutes");
-const forumRoutes = require("./src/routes/forumRoutes");
 const aggregatorRoutes = require("./src/routes/aggregatorRoutes");
+const recommenderRoutes = require("./src/routes/recommenderRoutes");
+const feedbackRoutes = require("./src/routes/feedbackRoutes");
 const { notFound, errorHandler } = require("./src/middleware/errorMiddleware");
 const cors = require("cors");
 
@@ -33,9 +33,9 @@ app.get("/", (req, res) => {
 app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/lessons", lessonRoutes);
-app.use("/api/quizzes", quizRoutes);
-app.use("/api/forums", forumRoutes);
 app.use("/api/aggregator", aggregatorRoutes);
+app.use("/api/recommendations", recommenderRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 // Not found middleware
 app.use(notFound);

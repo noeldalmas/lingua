@@ -1,39 +1,19 @@
 const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const thumbnailSchema = new mongoose.Schema({
-  url: String,
-  width: Number,
-  height: Number,
+const AggregatedContentSchema = new Schema({
+  videoId: { type: String, required: true, unique: true },
+  title: String,
+  description: String,
+  publishedAt: Date,
+  channelId: String,
+  categoryId: String,
+  category: String,
+  tags: [String],
+  duration: String,
+  viewCount: Number,
+  likeCount: Number,
+  language: String,
 });
 
-const aggregatedContentSchema = new mongoose.Schema(
-  {
-    kind: { type: String, required: true },
-    etag: { type: String, required: true },
-    videoId: { type: String, required: true, unique: true },
-    channelId: { type: String, required: true },
-    playlistId: { type: String },
-    publishedAt: { type: Date, required: true },
-    channelTitle: { type: String, required: true },
-    title: { type: String, required: true },
-    description: { type: String, required: true },
-    thumbnails: {
-      default: thumbnailSchema,
-      medium: thumbnailSchema,
-      high: thumbnailSchema,
-      standard: thumbnailSchema,
-      maxres: thumbnailSchema,
-    },
-    liveBroadcastContent: { type: String, required: true },
-    tags: { type: [String], required: false },
-    language: { type: String, required: true },
-  },
-  { timestamps: true }
-);
-
-const AggregatedContent = mongoose.model(
-  "AggregatedContent",
-  aggregatedContentSchema
-);
-
-module.exports = AggregatedContent;
+module.exports = mongoose.model("AggregatedContent", AggregatedContentSchema);

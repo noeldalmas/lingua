@@ -53,10 +53,10 @@ const comparePassword = async (enteredPassword, hashedPassword) => {
 
 // Generate JWT
 const generateToken = (user) => {
-  console.log("generateToken called with user:", user); // Confirm function call
+  console.log("generateToken called with user:", user);
   if (!user.role) {
     console.error("Error: User object is missing the role property.");
-    return null; // Return null or handle the error as appropriate
+    return null;
   }
   try {
     const token = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET, {

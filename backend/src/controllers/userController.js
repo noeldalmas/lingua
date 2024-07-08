@@ -139,6 +139,17 @@ const getAllUsers = async (req, res, next) => {
   }
 };
 
+// Get user data for Python app ML model
+const getAllUsersDataForML = async (req, res, next) => {
+  try {
+    const users = await userService.getAllUsersDataForML();
+
+    res.status(200).json(users);
+  } catch (error) {
+    next(error); // Pass the error to the next middleware
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
@@ -147,4 +158,5 @@ module.exports = {
   updateUser,
   deleteUser,
   getAllUsers,
+  getAllUsersDataForML,
 };

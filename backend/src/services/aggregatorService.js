@@ -1,99 +1,109 @@
 const axios = require("axios");
-const AggregatedContent = require("../models/AggregatedContent");
+const Video = require("../models/AggregatedContent");
 require("dotenv").config();
 
-const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
-const PYTHON_SERVICE_URL =
-  process.env.PYTHON_SERVICE_URL || "http://localhost:5000/extract_key_phrases";
-
-const AggregatorService = {
-  fetchYouTubeData: async (language) => {
-    if (!language) throw new Error("Language parameter is required");
-
-    const youtubeAPIUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=3&type=video&q=${encodeURIComponent(
-      "Learn " + language
-    )}&key=${YOUTUBE_API_KEY}`;
-
-    const response = await axios.get(youtubeAPIUrl);
-    if (!response.data.items.length)
-      throw new Error("No data fetched from YouTube");
-
-    return response.data.items.map((item) => ({
-      kind: item.kind,
-      etag: item.etag,
-      videoId: item.id.videoId,
-      channelId: item.snippet.channelId,
-      playlistId: item.id.playlistId || null,
-      publishedAt: item.snippet.publishedAt,
-      channelTitle: item.snippet.channelTitle,
-      title: item.snippet.title,
-      description: item.snippet.description,
-      thumbnails: item.snippet.thumbnails,
-      liveBroadcastContent: item.snippet.liveBroadcastContent,
-      tags: item.snippet.tags || [],
-      language: language,
-    }));
-  },
-
-  saveToMongoDB: async (videos) => {
-    console.log(
-      `Processing videos with IDs: ${videos.map((v) => v.videoId).join(", ")}`
-    );
-    for (const video of videos) {
-      const existingVideo = await AggregatedContent.findOne({
-        videoId: video.videoId,
-      });
-      if (existingVideo) {
-        console.log(
-          `Video with ID: ${video.videoId} already exists. Skipping...`
-        );
-      } else {
-        console.log(
-          `Enriching video with ID: ${video.videoId} with key phrases as tags.`
-        );
-        // Use an arrow function or bind this explicitly
-        await AggregatorService.enrichVideoWithKeyPhrases(video);
-        console.log(`Saving enriched video with ID: ${video.videoId}`);
-        await new AggregatedContent(video).save();
-      }
-    }
-    console.log("Videos processing completed.");
-  },
-
-  enrichVideoWithKeyPhrases: async function (video) {
-    const keyPhrases = await this.extractKeyPhrases({
-      title: video.title,
-      description: video.description,
-    });
-    // Assuming keyPhrases is an array of strings
-    video.tags = video.tags.concat(keyPhrases); // Add key phrases to video tags
-  },
-
-  extractKeyPhrases: async ({ title, description }) => {
-    console.log(
-      `Extracting key phrases for title: ${title}, description: ${description}`
-    );
-    if (!title || !description)
-      throw new Error(
-        "Title and description are required for key phrase extraction"
-      );
-    try {
-      const response = await axios.post(PYTHON_SERVICE_URL, {
-        text: `${title} ${description}`,
-      });
-      return response.data.key_phrases;
-    } catch (error) {
-      console.error(
-        "Error extracting key phrases:",
-        error.response ? error.response.data : error.message
-      );
-      throw error; // Re-throw the error to be caught by the calling function
-    }
-  },
-
-  getAggregatedContent: async () => {
-    return await AggregatedContent.find();
-  },
+const languageCodes = {
+  swahili: "sw",
+  // Add other languages and their ISO 639-1 codes as needed
 };
 
-module.exports = AggregatorService;
+const fetchYouTubeData = async (query, language, maxResults = 100) => {
+  try {
+    // Convert language to valid ISO 639-1 code if necessary
+    const isoLanguage = languageCodes[language.toLowerCase()] || language;
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
+      query
+    )}&maxResults=${maxResults}&relevanceLanguage=${isoLanguage}&key=${
+      process.env.YOUTUBE_API_KEY
+    }`;
+    const response = await axios.get(url);
+    return response.data.items.map((item) => ({
+      ...item,
+      language: isoLanguage,
+    }));
+  } catch (error) {
+    console.error(`Failed to fetch YouTube data: ${error.message}`);
+    throw error;
+  }
+};
+
+const getVideoDetails = async (videoId) => {
+  try {
+    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${videoId}&key=${process.env.YOUTUBE_API_KEY}`;
+    const response = await axios.get(url);
+    if (response.data.items.length === 0) throw new Error("Video not found");
+    return response.data.items[0];
+  } catch (error) {
+    console.error(
+      `Failed to fetch video details for videoId ${videoId}: ${error.message}`
+    );
+    throw error; // Rethrow to handle it in the calling function
+  }
+};
+
+const getCategoryNameById = async (categoryId) => {
+  try {
+    const url = `https://www.googleapis.com/youtube/v3/videoCategories?part=snippet&id=${categoryId}&key=${process.env.YOUTUBE_API_KEY}`;
+    const response = await axios.get(url);
+    if (response.data.items.length === 0) throw new Error("Category not found");
+    return response.data.items[0].snippet.title; // Return the category name
+  } catch (error) {
+    console.error(
+      `Failed to fetch category name for categoryId ${categoryId}: ${error.message}`
+    );
+    throw error; // Rethrow to handle it in the calling function
+  }
+};
+
+const storeVideoData = async (videos, language) => {
+  for (const video of videos) {
+    try {
+      // Check if the video already exists in the database
+      const existingVideo = await Video.findOne({ videoId: video.id.videoId });
+      if (existingVideo) {
+        console.log(
+          `Video with ID: ${video.id.videoId} already exists. Skipping...`
+        );
+        continue; // Skip to the next video if this one already exists
+      }
+
+      const videoDetails = await getVideoDetails(video.id.videoId);
+      const categoryName = await getCategoryNameById(
+        videoDetails.snippet.categoryId
+      );
+
+      const videoData = {
+        videoId: video.id.videoId,
+        title: videoDetails.snippet.title,
+        description: videoDetails.snippet.description,
+        publishedAt: videoDetails.snippet.publishedAt,
+        channelId: videoDetails.snippet.channelId,
+        categoryId: videoDetails.snippet.categoryId,
+        category: categoryName,
+        tags: videoDetails.snippet.tags,
+        duration: videoDetails.contentDetails.duration,
+        viewCount: videoDetails.statistics.viewCount,
+        likeCount: videoDetails.statistics.likeCount,
+        language: video.language, // Save the language as part of the video data
+      };
+      await Video.create(videoData);
+    } catch (error) {
+      console.error(
+        `Failed to store video data for videoId ${video.id.videoId}: ${error.message}`
+      );
+      // Optionally, handle the error (e.g., retry logic, logging, etc.)
+    }
+  }
+};
+
+// Get all videos
+const getAllVideos = async () => {
+  return Video.find({});
+};
+
+// Delete all videos
+const deleteAllVideos = async () => {
+  return Video.deleteMany({});
+};
+
+module.exports = { fetchYouTubeData, storeVideoData, getAllVideos, deleteAllVideos};

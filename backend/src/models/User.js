@@ -3,6 +3,27 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { Schema } = mongoose;
 
+const interactionSchema = new mongoose.Schema(
+  {
+    videoId: {
+      type: String,
+      required: true,
+    },
+    watchTime: {
+      type: Number,
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+    },
+    liked: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { _id: false }
+);
 
 const userPreferencesSchema = new mongoose.Schema(
   {
@@ -47,7 +68,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      select: false, // Do not include the password by default
+      select: false, // Hide the password by default
     },
     role: {
       type: String,
@@ -55,9 +76,10 @@ const userSchema = new mongoose.Schema(
       default: "student",
     },
     preferences: userPreferencesSchema,
+    interactions: [interactionSchema],
   },
   {
-    timestamps: true, // This will automatically create and update `createdAt` and `updatedAt`
+    timestamps: true,
   }
 );
 
