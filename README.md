@@ -20,12 +20,11 @@ Lingua is a web application designed to make African languages accessible online
 ## Architecture
 The Lingua application is built using the following technologies:
 - **Frontend**: React.js with Vite, hosted on AWS S3 with CloudFront
-- **Backend**: Node.js and Express.js, running on AWS Lambda with API Gateway
+- **Backend**: Node.js and Express.js
 - **Database**: MongoDB for real-time data storage
-- **Machine Learning**: Amazon SageMaker for training and deploying models
+- **Machine Learning**: Tensorflow
 - **Monitoring and Logging**: AWS CloudWatch
 
-![High-Level Architecture](sandbox:/mnt/data/A_high-level_architecture_diagram_of_a_web_applica.png)
 
 ## Installation
 
@@ -33,7 +32,6 @@ The Lingua application is built using the following technologies:
 - Node.js
 - npm or yarn
 - MongoDB
-- AWS CLI configured with appropriate permissions
 - Python and pip (for machine learning setup)
 
 ### Clone the Repository
