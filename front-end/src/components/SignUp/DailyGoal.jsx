@@ -17,14 +17,28 @@ const DailyGoal = () => {
   const dispatch = useDispatch();
   const signUpData = useSelector((state) => state.signUp);
   const [selectedGoal, setSelectedGoal] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
     setSelectedGoal(signUpData.dailyGoal);
   }, [signUpData]);
 
+  const validateForm = () => {
+    const errors = {};
+    let isValid = true;
+    if (!selectedGoal) {
+      errors.goal = "This field is required";
+      isValid = false;
+    }
+    setFieldErrors(errors);
+    return isValid;
+  };
+
   const handleContinue = () => {
-    dispatch(updateSignUpData({ dailyGoal: selectedGoal }));
-    navigate("/signup/topics-you-love");
+    if (validateForm()) {
+      dispatch(updateSignUpData({ dailyGoal: selectedGoal }));
+      navigate("/signup/import-content");
+    }
   };
 
   return (
@@ -40,7 +54,9 @@ const DailyGoal = () => {
               color="primary"
               fullWidth
               onClick={() => setSelectedGoal(goal.label)}
-              sx={{ mt: 1 }}
+              sx={{
+                mt: 1
+              }}
             >
               {goal.label}
               <br />
@@ -51,6 +67,11 @@ const DailyGoal = () => {
           </Grid>
         ))}
       </Grid>
+      {fieldErrors.goal && (
+        <Typography color="error" sx={{ mt: 2 }}>
+          {fieldErrors.goal}
+        </Typography>
+      )}
       <Button
         variant="contained"
         color="primary"

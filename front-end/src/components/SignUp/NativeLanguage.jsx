@@ -15,9 +15,27 @@ const NativeLanguage = () => {
     setLanguage(signUpData.nativeLanguage);
   }, [signUpData]);
 
+  const [fieldErrors, setFieldErrors] = useState({
+    language: false,
+  });
+
+  const validateForm = () => {
+    const errors = {};
+    let isValid = true;
+    if (!language) {
+      errors.language = true;
+      isValid = false;
+    }
+    setFieldErrors(errors);
+    return isValid;
+  };
+
   const handleContinue = () => {
-    dispatch(updateSignUpData({ nativeLanguage: language }));
-    navigate("/signup/daily-goal");
+    if (validateForm()) {
+      dispatch(updateSignUpData({ nativeLanguage: language }));
+      navigate("/signup/daily-goal");
+    }
+    
   };
 
   return (
@@ -32,6 +50,9 @@ const NativeLanguage = () => {
         onChange={(e) => setLanguage(e.target.value)}
         fullWidth
         sx={{ my: 2 }}
+        required
+        error={fieldErrors.language}
+        helperText={fieldErrors.language ? "This field is required" : ""}
       >
         {["Swahili", "Kikuyu", "Lingala"].map((lang) => (
           <MenuItem key={lang} value={lang}>

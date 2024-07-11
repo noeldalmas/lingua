@@ -11,11 +11,16 @@ import {
   Button,
 } from "@mui/material";
 import { AccountCircle, ArrowDropDown } from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/actions/authActions";
 
 const NavigationBar = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -30,6 +35,18 @@ const NavigationBar = () => {
     navigate(path);
   };
 
+  const handleLogout = () => {
+    handleMenuClose();
+    dispatch(logout());
+    navigate("/");
+  };
+
+  // Do not render the navbar on the landing page, signup, or login page
+  const noNavBarRoutes = ["/", "/signup", "/login"];
+  if (noNavBarRoutes.includes(location.pathname)) {
+    return null;
+  }
+
   return (
     <AppBar position="static">
       <Toolbar>
@@ -37,7 +54,7 @@ const NavigationBar = () => {
           Lingua
         </Typography>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Button color="inherit" onClick={() => navigate("/")}>
+          <Button color="inherit" onClick={() => navigate("/learn")}>
             Lessons
           </Button>
           <Button color="inherit" onClick={() => navigate("/tutors")}>
@@ -75,7 +92,7 @@ const NavigationBar = () => {
             <MenuItem onClick={() => handleMenuClick("/invite-friends")}>
               Invite Friends
             </MenuItem>
-            <MenuItem onClick={handleMenuClose}>Log out</MenuItem>
+            <MenuItem onClick={handleLogout}>Log out</MenuItem>
           </Menu>
         </Box>
       </Toolbar>

@@ -11,7 +11,10 @@ import {
   Paper,
 } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { updateSignUpData } from "../redux/actions/signUpActions";
+import {
+  updateSignUpData,
+  completeSignUp,
+} from "../redux/actions/signUpActions";
 import NativeLanguage from "../components/SignUp/NativeLanguage";
 import DailyGoal from "../components/SignUp/DailyGoal";
 import TopicsYouLove from "../components/SignUp/TopicsYouLove";
@@ -24,28 +27,84 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const signUpData = useSelector((state) => state.signUp);
   const [formData, setFormData] = useState({
-    language: signUpData.language || "",
+    languageToLearn: signUpData.language || "",
     level: signUpData.level || "",
     name: signUpData.name || "",
     email: signUpData.email || "",
     username: signUpData.username || "",
     password: signUpData.password || "",
+    nativeLanguage: signUpData.nativeLanguage || "",
+    dailyGoal: signUpData.dailyGoal || "",
+    topics: signUpData.topics || [],
   });
+
+  const [fieldErrors, setFieldErrors] = useState({
+    language: false,
+    level: false,
+    name: false,
+    email: false,
+    username: false,
+    password: false,
+  });
+
+  const validateForm = () => {
+    const errors = {};
+    let isValid = true;
+    Object.keys(fieldErrors).forEach((key) => {
+      // Change from formData to fieldErrors
+      if (!formData[key]) {
+        errors[key] = true;
+        isValid = false;
+      }
+    });
+    setFieldErrors(errors);
+    return isValid;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    if (value) {
+      setFieldErrors({ ...fieldErrors, [name]: false });
+    }
+  };
+
+  const handleNativeLanguageChange = (nativeLanguage) => {
+    setFormData({ ...formData, nativeLanguage });
+  };
+
+  const handleDailyGoalChange = (dailyGoal) => {
+    setFormData({ ...formData, dailyGoal });
+  };
+
+  const handleTopicsChange = (topics) => {
+    setFormData({ ...formData, topics });
   };
 
   const handleCreateAccount = () => {
-    dispatch(updateSignUpData(formData));
-    navigate("/signup/native-language");
+    if (validateForm()) {
+      // Proceed with account creation
+      dispatch(updateSignUpData(formData));
+      navigate("/signup/native-language");
+    }
   };
 
-  const handleCompleteSignUp = () => {
-    // Finalize sign-up and navigate to Learn page
-    dispatch(updateSignUpData(formData));
-    navigate("/learn");
+  const handleCompleteSignUp = async () => {
+    console.log("Sign up data", formData);
+    try {
+      dispatch(updateSignUpData(formData));
+      const resultAction = await dispatch(completeSignUp(formData));
+      if (completeSignUp.fulfilled.match(resultAction)) {
+        console.log("Sign up successful");
+        navigate("/learn");
+      } else {
+        // This else block might not be necessary if you handle errors in the rejected matcher or with rejectWithValue
+        throw new Error("Sign up process failed");
+      }
+    } catch (error) {
+      console.log("formData", formData);
+      console.error("Sign up failed", error.message, error.stack);
+    }
   };
 
   return (
@@ -75,6 +134,11 @@ const SignUp = () => {
                     name="language"
                     value={formData.language}
                     onChange={handleInputChange}
+                    required
+                    error={fieldErrors.language}
+                    helperText={
+                      fieldErrors.language ? "This field is required" : ""
+                    }
                   >
                     {languages.map((lang) => (
                       <MenuItem key={lang} value={lang}>
@@ -90,6 +154,11 @@ const SignUp = () => {
                     name="level"
                     value={formData.level}
                     onChange={handleInputChange}
+                    required
+                    error={fieldErrors.level}
+                    helperText={
+                      fieldErrors.level ? "This field is required" : ""
+                    }
                   >
                     <MenuItem value="Beginner">Beginner</MenuItem>
                     <MenuItem value="Intermediate">Intermediate</MenuItem>
@@ -102,6 +171,11 @@ const SignUp = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
+                    required
+                    error={fieldErrors.name}
+                    helperText={
+                      fieldErrors.name ? "This field is required" : ""
+                    }
                   />
                   <TextField
                     fullWidth
@@ -110,6 +184,11 @@ const SignUp = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
+                    required
+                    error={fieldErrors.email}
+                    helperText={
+                      fieldErrors.email ? "This field is required" : ""
+                    }
                   />
                   <TextField
                     fullWidth
@@ -118,6 +197,11 @@ const SignUp = () => {
                     name="username"
                     value={formData.username}
                     onChange={handleInputChange}
+                    required
+                    error={fieldErrors.username}
+                    helperText={
+                      fieldErrors.username ? "This field is required" : ""
+                    }
                   />
                   <TextField
                     fullWidth
@@ -127,6 +211,11 @@ const SignUp = () => {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
+                    required
+                    error={fieldErrors.password}
+                    helperText={
+                      fieldErrors.password ? "This field is required" : ""
+                    }
                   />
                   <Button
                     variant="contained"
@@ -178,9 +267,20 @@ const SignUp = () => {
           </Box>
         }
       />
-      <Route path="/native-language" element={<NativeLanguage />} />
-      <Route path="/daily-goal" element={<DailyGoal />} />
-      <Route path="/topics-you-love" element={<TopicsYouLove />} />
+      <Route
+        path="/native-language"
+        element={
+          <NativeLanguage onNativeLanguageChange={handleNativeLanguageChange} />
+        }
+      />
+      <Route
+        path="/daily-goal"
+        element={<DailyGoal onDailyGoalChange={handleDailyGoalChange} />}
+      />
+      <Route
+        path="/topics-you-love"
+        element={<TopicsYouLove onTopicsChange={handleTopicsChange} />}
+      />
       <Route
         path="/import-content"
         element={<ImportContent onCompleteSignUp={handleCompleteSignUp} />}

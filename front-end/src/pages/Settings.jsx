@@ -1,11 +1,8 @@
 // /src/pages/Settings.jsx
-import React from "react";
+import React, { useState } from "react";
 import {
   Container,
   Box,
-  Typography,
-  TextField,
-  Button,
   List,
   ListItem,
   ListItemIcon,
@@ -24,73 +21,162 @@ import {
   Help,
   ExitToApp,
 } from "@mui/icons-material";
+import Profile from "../components/Profile";
+import Account from "../components/Account";
 
 const Settings = () => {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+
+  const handleListItemClick = (event, index) => {
+    setSelectedIndex(index);
+  };
+
+  const renderContent = () => {
+    switch (selectedIndex) {
+      case 0:
+        return <Account />;
+      case 1:
+        return <Profile />;
+      case 2:
+        return <div>Notifications Content</div>;
+      case 3:
+        return <div>Points Content</div>;
+      case 4:
+        return <div>Invite Friends Content</div>;
+      case 5:
+        return <div>App Settings Content</div>;
+      case 6:
+        return <div>General Content</div>;
+      case 7:
+        return <div>Languages Content</div>;
+      case 8:
+        return <div>Billing Content</div>;
+      case 9:
+        return <div>Help Content</div>;
+      case 10:
+        return <div>Log out Content</div>;
+      default:
+        return <Account />;
+    }
+  };
+
   return (
     <Container maxWidth="lg" sx={{ display: "flex", my: 5 }}>
-      <Box sx={{ width: "20%", borderRight: "1px solid #ddd" }}>
+      <Box
+        sx={{
+          width: "20%",
+          borderRight: "1px solid #ddd",
+          position: "fixed",
+          height: "100vh",
+          overflow: "auto",
+        }}
+      >
         <List component="nav">
-          <ListItem button>
+          <ListItem
+            button
+            selected={selectedIndex === 0}
+            onClick={(event) => handleListItemClick(event, 0)}
+          >
             <ListItemIcon>
               <AccountCircle />
             </ListItemIcon>
             <ListItemText primary="Account" />
           </ListItem>
-          <ListItem button>
+          <ListItem
+            button
+            selected={selectedIndex === 1}
+            onClick={(event) => handleListItemClick(event, 1)}
+          >
             <ListItemIcon>
               <Person />
             </ListItemIcon>
             <ListItemText primary="Profile" />
           </ListItem>
-          <ListItem button>
+          <ListItem
+            button
+            selected={selectedIndex === 2}
+            onClick={(event) => handleListItemClick(event, 2)}
+          >
             <ListItemIcon>
               <Notifications />
             </ListItemIcon>
             <ListItemText primary="Notifications" />
           </ListItem>
-          <ListItem button>
+          <ListItem
+            button
+            selected={selectedIndex === 3}
+            onClick={(event) => handleListItemClick(event, 3)}
+          >
             <ListItemIcon>
               <Star />
             </ListItemIcon>
             <ListItemText primary="Points" />
           </ListItem>
-          <ListItem button>
+          <ListItem
+            button
+            selected={selectedIndex === 4}
+            onClick={(event) => handleListItemClick(event, 4)}
+          >
             <ListItemIcon>
               <People />
             </ListItemIcon>
             <ListItemText primary="Invite Friends" />
           </ListItem>
-          <ListItem button>
+          <ListItem
+            button
+            selected={selectedIndex === 5}
+            onClick={(event) => handleListItemClick(event, 5)}
+          >
             <ListItemIcon>
               <SettingsIcon />
             </ListItemIcon>
             <ListItemText primary="App settings" />
           </ListItem>
-          <ListItem button>
+          <ListItem
+            button
+            selected={selectedIndex === 6}
+            onClick={(event) => handleListItemClick(event, 6)}
+          >
             <ListItemIcon>
               <MenuBook />
             </ListItemIcon>
             <ListItemText primary="General" />
           </ListItem>
-          <ListItem button>
+          <ListItem
+            button
+            selected={selectedIndex === 7}
+            onClick={(event) => handleListItemClick(event, 7)}
+          >
             <ListItemIcon>
               <Language />
             </ListItemIcon>
             <ListItemText primary="Languages" />
           </ListItem>
-          <ListItem button>
+          <ListItem
+            button
+            selected={selectedIndex === 8}
+            onClick={(event) => handleListItemClick(event, 8)}
+          >
             <ListItemIcon>
               <Receipt />
             </ListItemIcon>
             <ListItemText primary="Billing" />
           </ListItem>
-          <ListItem button>
+          <ListItem
+            button
+            selected={selectedIndex === 9}
+            onClick={(event) => handleListItemClick(event, 9)}
+          >
             <ListItemIcon>
               <Help />
             </ListItemIcon>
             <ListItemText primary="Help" />
           </ListItem>
-          <ListItem button>
+          <ListItem
+            button
+            selected={selectedIndex === 10}
+            onClick={(event) => handleListItemClick(event, 10)}
+          >
             <ListItemIcon>
               <ExitToApp />
             </ListItemIcon>
@@ -98,40 +184,7 @@ const Settings = () => {
           </ListItem>
         </List>
       </Box>
-      <Box sx={{ width: "80%", p: 3 }}>
-        <Typography variant="h4" gutterBottom>
-          Account
-        </Typography>
-        <TextField fullWidth label="Username" value="titan2" sx={{ mb: 2 }} />
-        <TextField
-          fullWidth
-          label="Email"
-          value="theinherenttitan@gmail.com"
-          sx={{ mb: 2 }}
-        />
-        <TextField fullWidth label="Password" type="password" sx={{ mb: 2 }} />
-        <TextField
-          fullWidth
-          label="Confirm Password"
-          type="password"
-          sx={{ mb: 2 }}
-        />
-        <Box>
-          <Typography variant="body1">Member Since: March 04, 2024</Typography>
-          <Typography variant="body1">
-            Current Tier: FREE{" "}
-            <Button variant="contained" sx={{ ml: 1 }}>
-              Change plan
-            </Button>
-          </Typography>
-          <Typography variant="body1">LingQs Limit: 20</Typography>
-          <Typography variant="body1">Total LingQs: 1</Typography>
-          <Typography variant="body1">Total Imports: 0</Typography>
-        </Box>
-        <Button variant="contained" color="error" sx={{ mt: 3 }}>
-          Delete your account
-        </Button>
-      </Box>
+      <Box sx={{ width: "80%", ml: "20%", p: 3 }}>{renderContent()}</Box>
     </Container>
   );
 };

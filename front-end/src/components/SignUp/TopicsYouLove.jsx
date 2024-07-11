@@ -34,20 +34,40 @@ const TopicsYouLove = () => {
   const dispatch = useDispatch();
   const signUpData = useSelector((state) => state.signUp);
   const [selectedTopics, setSelectedTopics] = useState([]);
+  const [fieldErrors, setFieldErrors] = useState({}); // Added state for field errors
 
   useEffect(() => {
     setSelectedTopics(signUpData.topics);
   }, [signUpData]);
 
   const handleToggleTopic = (topic) => {
-    setSelectedTopics((prev) =>
-      prev.includes(topic) ? prev.filter((t) => t !== topic) : [...prev, topic]
-    );
+    setSelectedTopics((prev) => {
+      const updatedTopics = prev.includes(topic)
+        ? prev.filter((t) => t !== topic)
+        : [...prev, topic];
+      if (updatedTopics.length >= 5) {
+        setFieldErrors((errors) => ({ ...errors, topics: undefined }));
+      }
+      return updatedTopics;
+    });
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    let isValid = true;
+    if (selectedTopics.length < 5) {
+      errors.topics = "Select 5 or more"; // Corrected error key to 'topics'
+      isValid = false;
+    }
+    setFieldErrors(errors);
+    return isValid;
   };
 
   const handleContinue = () => {
-    dispatch(updateSignUpData({ topics: selectedTopics }));
-    navigate("/signup/import-content");
+    if (validateForm()) {
+      dispatch(updateSignUpData({ topics: selectedTopics }));
+      navigate("/signup/import-content");
+    }
   };
 
   return (
@@ -75,13 +95,18 @@ const TopicsYouLove = () => {
           </Grid>
         ))}
       </Grid>
+      {fieldErrors.topics && (
+        <Typography color="error" sx={{ mt: 2 }}>
+          {fieldErrors.topics}
+        </Typography>
+      )}
       <Button
         variant="contained"
         color="primary"
         onClick={handleContinue}
         sx={{ mt: 3, mx: 2 }}
       >
-        Continue
+        Complete Sign Up
       </Button>
       <Button
         variant="outlined"
