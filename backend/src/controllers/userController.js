@@ -16,16 +16,19 @@ const registerUser = async (req, res, next) => {
 
     res.status(201).json({
       _id: user._id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      name: user.name,
+      username: user.username,
       email: user.email,
       role: user.role,
-      preferences: user.preferences,
-      createdAt: user.createdAt,
+      nativeLanguage: user.nativeLanguage,
+      dailyGoal: user.dailyGoal,
+      topics: user.topics,
+      languageToLearn: user.languageToLearn,
+      level: user.level,
       token: generateToken(user),
     });
   } catch (error) {
-    next(error); // Pass the error to the next middleware
+    next(error);
   }
 };
 

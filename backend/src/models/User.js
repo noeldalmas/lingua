@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { Schema } = mongoose;
 
 const interactionSchema = new mongoose.Schema(
   {
@@ -25,38 +24,13 @@ const interactionSchema = new mongoose.Schema(
   { _id: false }
 );
 
-const userPreferencesSchema = new mongoose.Schema(
-  {
-    preferredLanguages: {
-      type: [String],
-      default: [],
-    },
-    preferredGenres: {
-      type: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
-      default: [],
-    },
-    level: {
-      type: String,
-      enum: ["Beginner", "Intermediate", "Advanced"],
-      default: "Intermediate",
-    },
-    notifications: {
-      email: {
-        type: Boolean,
-        default: true,
-      },
-    },
-  },
-  { _id: false }
-);
-
 const userSchema = new mongoose.Schema(
   {
-    firstName: {
+    name: {
       type: String,
       required: true,
     },
-    lastName: {
+    username: {
       type: String,
       required: true,
     },
@@ -75,7 +49,21 @@ const userSchema = new mongoose.Schema(
       enum: ["student", "teacher", "admin"],
       default: "student",
     },
-    preferences: userPreferencesSchema,
+    nativeLanguage: {
+      type: String,
+      required: true,
+    },
+    dailyGoal: {
+      type: String,
+      enum: ["Casual", "Steady", "Keen", "Intense"],
+    },
+    topics: {
+      type: [String],
+    },
+    languageToLearn: {
+      type: String,
+      required: true,
+    },
     interactions: [interactionSchema],
   },
   {
