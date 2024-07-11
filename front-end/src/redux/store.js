@@ -1,13 +1,13 @@
-// /src/store.js
+// src/redux/store.js
 import { configureStore } from "@reduxjs/toolkit";
-import { thunk } from "redux-thunk"; // Named import
 import signUpReducer from "./reducers/signUpReducer";
+import authReducer from "./reducers/authReducer";
 
 const store = configureStore({
   reducer: {
     signUp: signUpReducer,
+    auth: authReducer,
   },
-  middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(thunk),
 });
 
 export default store;
