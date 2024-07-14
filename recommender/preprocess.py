@@ -70,4 +70,7 @@ def preprocess_video_data(video_data, preferred_languages):
     video_data.fillna({'viewCount': 0, 'likeCount': 0,
                       'categoryId': '0'}, inplace=True)
 
+    # Rename videoId to video_id for consistency
+    video_data = video_data.rename(columns={'videoId': 'video_id'})
+
     return video_data

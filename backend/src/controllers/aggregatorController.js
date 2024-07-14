@@ -9,10 +9,11 @@ const searchAndRecommend = async (req, res, next) => {
     const userId = req.user._id;
     const query = req.body.query;
     const language = req.body.language;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = 10;
 
     let userProfile;
     try {
-      // Use UserService to fetch the user profile instead of RecommenderService
       userProfile = await UserService.findUserByIdForML(userId);
       if (!userProfile) {
         throw new Error("User profile not found");
@@ -26,25 +27,6 @@ const searchAndRecommend = async (req, res, next) => {
         statusCode: 404,
         message: "User profile not found. Please ensure the user exists.",
       });
-    }
-
-    let videos;
-    try {
-      videos = await AggregatorService.fetchYouTubeData(query, language);
-    } catch (error) {
-      console.error(`Failed to fetch video data: ${error.message}`);
-      return res.status(500).json({
-        status: "error",
-        statusCode: 500,
-        message: "Failed to fetch video data. Please try again later.",
-      });
-    }
-
-    try {
-      await AggregatorService.storeVideoData(videos, language);
-    } catch (error) {
-      console.error(`Failed to store video data: ${error.message}`);
-      // Proceed without throwing error to allow recommendations to be processed
     }
 
     let recommendations;
@@ -63,12 +45,54 @@ const searchAndRecommend = async (req, res, next) => {
       });
     }
 
-    const recommendedVideoIds = recommendations.map((rec) => rec.videoId);
-    const filteredSearchResults = videos.filter((video) =>
-      recommendedVideoIds.includes(video.id.videoId)
-    );
+    const recommendedVideoIds = recommendations.map((rec) => rec[0]);
+    const recommendedScores = recommendations.map((rec) => rec[1]);
 
-    res.status(200).json({ recommendations: filteredSearchResults });
+    // Log recommended video IDs and their scores
+    console.log("Recommended Video IDs and Scores:", recommendations);
+
+    // Fetch video information from the database using the recommended video IDs
+    let videoData;
+    try {
+      videoData = await AggregatorService.getVideoDetailsByIds(
+        recommendedVideoIds
+      );
+    } catch (error) {
+      console.error(`Failed to fetch video details: ${error.message}`);
+      return res.status(500).json({
+        status: "error",
+        statusCode: 500,
+        message: "Failed to fetch video details. Please try again later.",
+      });
+    }
+
+    // Attach scores to the video data
+    const videoDataWithScores = videoData.map((video) => {
+      const scoreIndex = recommendedVideoIds.indexOf(video.videoId);
+      return {
+        ...video._doc,
+        score: recommendedScores[scoreIndex],
+      };
+    });
+
+    // Sort by score in descending order
+    videoDataWithScores.sort((a, b) => b.score - a.score);
+
+    // Paginate the results
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const paginatedResults = videoDataWithScores.slice(startIndex, endIndex);
+
+    // Format the results to include only necessary fields
+    const formattedResults = paginatedResults.map((video) => ({
+      videoId: video.videoId,
+      title: video.title,
+      channelName: video.channelName,
+      duration: video.duration,
+      score: video.score,
+    }));
+
+    res.status(200).json({ recommendations: formattedResults });
   } catch (error) {
     console.error(`Unhandled error in searchAndRecommend: ${error.message}`);
     next(error);

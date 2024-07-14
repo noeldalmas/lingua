@@ -18,7 +18,7 @@ def calculate_user_similarity(user_profile):
 
     # Create a matrix with users as rows and videos as columns, fill with user ratings (watch time)
     user_video_matrix = interactions.pivot(
-        index='user_id', columns='video_id', values='watch_time').fillna(0)
+        index='user_id', columns='videoId', values='watchTime').fillna(0)
 
     # Calculate cosine similarity between users
     user_similarity = cosine_similarity(user_video_matrix)
@@ -31,9 +31,6 @@ def calculate_user_similarity(user_profile):
 
 
 def calculate_item_similarity(video_data):
-    # Ensure 'videoId' is renamed to 'video_id' for consistency
-    video_data = video_data.rename(columns={'videoId': 'video_id'})
-
     # Use TF-IDF vectorizer to convert combined title and description into vectors
     tfidf_vectorizer = TfidfVectorizer(stop_words='english')
     tfidf_matrix = tfidf_vectorizer.fit_transform(video_data['combined_text'])
@@ -62,7 +59,7 @@ def collaborative_filtering_recommendations(user_id, user_similarity, user_profi
         sim_user_data = pd.DataFrame(user_profile['interactions'])
         sim_user_data = sim_user_data[sim_user_data['user_id'] == sim_user]
         for _, row in sim_user_data.iterrows():
-            recommendations[row['video_id']] += row['watch_time'] * \
+            recommendations[row['videoId']] += row['watchTime'] * \
                 user_similarity.loc[user_id, sim_user]
 
     # Sort recommendations by score
@@ -83,7 +80,7 @@ def content_based_filtering_recommendations(user_id, user_profile, item_similari
 
     # Get user's watched videos
     user_watched_videos = interactions[interactions['user_id']
-                                       == user_id]['video_id']
+                                       == user_id]['videoId']
 
     # Generate recommendations based on item similarity
     recommendations = defaultdict(float)
@@ -103,9 +100,6 @@ def content_based_filtering_recommendations(user_id, user_profile, item_similari
 
 
 def content_based_filtering_recommendations_query(query, video_data):
-    # Ensure 'videoId' is renamed to 'video_id' for consistency
-    video_data = video_data.rename(columns={'videoId': 'video_id'})
-
     # Use TF-IDF vectorizer to convert combined title and description into vectors
     tfidf_vectorizer = TfidfVectorizer(stop_words='english')
     tfidf_matrix = tfidf_vectorizer.fit_transform(video_data['combined_text'])
@@ -127,9 +121,6 @@ def content_based_filtering_recommendations_query(query, video_data):
 
 
 def hybrid_recommendations(user_id, user_profile, user_data, video_data, query=None):
-    # Ensure 'videoId' is renamed to 'video_id' for consistency
-    video_data = video_data.rename(columns={'videoId': 'video_id'})
-
     if query:
         # If a query is provided, use content-based filtering on the query
         query_recommendations = content_based_filtering_recommendations_query(
@@ -179,10 +170,8 @@ def hybrid_recommendations(user_id, user_profile, user_data, video_data, query=N
 
 
 def filter_and_sort_by_profile(recommendations, user_profile, video_data):
-    preferred_languages = user_profile.get(
-        'preferences', {}).get('preferredLanguages', [])
-    preferred_genres = user_profile.get(
-        'preferences', {}).get('preferredGenres', [])
+    preferred_languages = user_profile.get('nativeLanguage', [])
+    preferred_topics = user_profile.get('topics', [])
 
     # Filter recommendations by preferred languages
     filtered_recommendations = [
@@ -190,14 +179,14 @@ def filter_and_sort_by_profile(recommendations, user_profile, video_data):
         if video_data.loc[video_data['video_id'] == vid, 'language'].values[0] in preferred_languages
     ]
 
-    # Sort by preferred genres and other criteria
-    genre_scores = {vid: score for vid, score in filtered_recommendations}
-    for genre in preferred_genres:
+    # Sort by preferred topics and other criteria
+    topic_scores = {vid: score for vid, score in filtered_recommendations}
+    for topic in preferred_topics:
         for vid, score in filtered_recommendations:
-            if genre in video_data.loc[video_data['video_id'] == vid, 'tags'].values[0]:
-                genre_scores[vid] += score
+            if topic in video_data.loc[video_data['video_id'] == vid, 'tags'].values[0]:
+                topic_scores[vid] += score
 
     sorted_recommendations = sorted(
-        genre_scores.items(), key=lambda item: item[1], reverse=True)
+        topic_scores.items(), key=lambda item: item[1], reverse=True)
 
     return sorted_recommendations

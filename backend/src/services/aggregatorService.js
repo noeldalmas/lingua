@@ -55,6 +55,20 @@ const getCategoryNameById = async (categoryId) => {
   }
 };
 
+const getChannelNameById = async (channelId) => {
+  try {
+    const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${process.env.YOUTUBE_API_KEY}`;
+    const response = await axios.get(url);
+    if (response.data.items.length === 0) throw new Error("Channel not found");
+    return response.data.items[0].snippet.title; // Return the channel name
+  } catch (error) {
+    console.error(
+      `Failed to fetch channel name for channelId ${channelId}: ${error.message}`
+    );
+    throw error; // Rethrow to handle it in the calling function
+  }
+};
+
 const storeVideoData = async (videos, language) => {
   for (const video of videos) {
     try {
@@ -71,6 +85,7 @@ const storeVideoData = async (videos, language) => {
       const categoryName = await getCategoryNameById(
         videoDetails.snippet.categoryId
       );
+      const channelName = await getChannelNameById(videoDetails.snippet.channelId);
 
       const videoData = {
         videoId: video.id.videoId,
@@ -78,6 +93,7 @@ const storeVideoData = async (videos, language) => {
         description: videoDetails.snippet.description,
         publishedAt: videoDetails.snippet.publishedAt,
         channelId: videoDetails.snippet.channelId,
+        channelName: channelName,
         categoryId: videoDetails.snippet.categoryId,
         category: categoryName,
         tags: videoDetails.snippet.tags,
@@ -101,9 +117,19 @@ const getAllVideos = async () => {
   return Video.find({});
 };
 
+// Get video details by video IDs
+const getVideoDetailsByIds = async (videoIds) => {
+  try {
+    return await Video.find({ videoId: { $in: videoIds } });
+  } catch (error) {
+    console.error(`Failed to fetch video details: ${error.message}`);
+    throw error;
+  }
+};
+
 // Delete all videos
 const deleteAllVideos = async () => {
   return Video.deleteMany({});
 };
 
-module.exports = { fetchYouTubeData, storeVideoData, getAllVideos, deleteAllVideos};
+module.exports = { fetchYouTubeData, storeVideoData, getAllVideos, getVideoDetailsByIds, deleteAllVideos };

@@ -7,6 +7,7 @@ const AggregatedContentSchema = new Schema({
   description: String,
   publishedAt: Date,
   channelId: String,
+  channelName: String,
   categoryId: String,
   category: String,
   tags: [String],

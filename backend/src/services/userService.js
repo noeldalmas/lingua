@@ -31,26 +31,22 @@ const getAllUsersDataForML = async () => {
 };
 
 const findUserByIdForML = async (id) => {
-  const user = await User.findById(id, "interactions preferences")
-    .populate("preferences.preferredGenres", "name") // Populate genre names
-    .lean();
+  const user = await User.findById(
+    id,
+    "interactions nativeLanguage languageToLearn dailyGoal topics"
+  ).lean();
 
   if (!user) {
     return null;
   }
 
-  // Exclude notifications from preferences
-  const { notifications, ...preferencesWithoutNotifications } =
-    user.preferences;
-
   const userProfile = {
     interactions: user.interactions,
-    preferences: preferencesWithoutNotifications,
+    nativeLanguage: user.nativeLanguage,
+    languageToLearn: user.languageToLearn,
+    dailyGoal: user.dailyGoal,
+    topics: user.topics,
   };
-
-  // Replace genre IDs with their names in preferredGenres
-  userProfile.preferences.preferredGenres =
-    userProfile.preferences.preferredGenres.map((genre) => genre.name);
 
   return { userProfile };
 };

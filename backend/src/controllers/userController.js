@@ -1,11 +1,19 @@
 const userService = require("../services/userService");
 const { generateToken } = require("../utils/auth");
 
+// /src/controllers/userController.js
 const registerUser = async (req, res, next) => {
   const userData = req.body;
   userData.role = "student";
 
   try {
+    const requiredFields = ["name", "username", "email", "password", "nativeLanguage", "dailyGoal", "topics", "languageToLearn"];
+    for (const field of requiredFields) {
+      if (!userData[field]) {
+        return res.status(400).json({ message: `${field} is required` });
+      }
+    }
+
     const existingUser = await userService.findUserByEmail(userData.email);
 
     if (existingUser) {
@@ -28,14 +36,22 @@ const registerUser = async (req, res, next) => {
       token: generateToken(user),
     });
   } catch (error) {
+    console.error("Registration error:", error);
     next(error);
   }
 };
+
 
 const loginUser = async (req, res, next) => {
   const { email, password } = req.body;
 
   try {
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: "Email and password are required" });
+    }
+
     const { user, token } = await userService.authenticateUser(email, password);
 
     res.status(200).json({
@@ -46,7 +62,9 @@ const loginUser = async (req, res, next) => {
       token,
     });
   } catch (error) {
-    next(error); // Pass the error to the next middleware
+    console.error("Login error:", error);
+    res.status(401).json({ message: "Invalid credentials" });
+    next(error);
   }
 };
 

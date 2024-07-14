@@ -4,7 +4,7 @@ const RecommenderController = require("../controllers/recommenderController");
 const { protect } = require("../utils/auth");
 
 // Route for getting recommendations based on user profile
-router.post(
+router.get(
   "/",
   protect,
   RecommenderController.getRecommendations

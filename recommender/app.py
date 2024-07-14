@@ -62,14 +62,12 @@ def fetch_user_data():
 @app.route('/recommendations/<user_id>', methods=['GET'])
 def get_recommendations(user_id):
     try:
-        # Log the received payload
         logging.debug(
             "Received request for user_id: %s with query params: %s", user_id, request.args)
 
         user_profile_str = request.args.get('profile')
-        query = request.args.get('query')
+        query = request.args.get('query', '').strip()
 
-        # Log received parameters
         logging.debug(f"Received request for user_id: {user_id}")
         logging.debug(f"User profile: {user_profile_str}")
         logging.debug(f"Query: {query}")
@@ -93,6 +91,8 @@ def get_recommendations(user_id):
 
         recommendations = hybrid_recommendations(
             user_id, user_profile, user_data, video_data, query)
+
+        logging.debug(f"Recommended Video IDs and Scores: {recommendations}")
 
         return jsonify({'recommendations': recommendations})
     except Exception as e:
