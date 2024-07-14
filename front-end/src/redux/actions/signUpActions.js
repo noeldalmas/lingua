@@ -2,7 +2,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { setSignUpData } from "../reducers/signUpReducer";
-import { REGISTER_SUCCESS, REGISTER_FAIL } from "./authActions";
+import { REGISTER_SUCCESS, REGISTER_FAIL } from "./authActions.js";
 import config from "../../config";
 
 export const updateSignUpData = (data) => (dispatch) => {

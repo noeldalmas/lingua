@@ -1,7 +1,6 @@
 # preprocess.py
 import re
 import pandas as pd
-from langdetect import detect, LangDetectException
 
 
 def clean_text(text):
@@ -24,26 +23,7 @@ def process_tags(tags):
     return []
 
 
-def filter_language(text, preferred_languages):
-    try:
-        detected_language = detect(text)
-        if detected_language in preferred_languages:
-            return True
-    except LangDetectException:
-        return False
-    return False
-
-
-def is_educational(category_id, combined_text, tags):
-    if category_id == "27":  # Education category
-        return True
-    # Additional heuristic checks for educational content
-    educational_keywords = ["tutorial", "lesson",
-                            "how to", "course", "education", "learning"]
-    return any(keyword in combined_text.lower() for keyword in educational_keywords)
-
-
-def preprocess_video_data(video_data, preferred_languages):
+def preprocess_video_data(video_data):
     # Clean text fields
     video_data['title'] = video_data['title'].apply(clean_text)
     video_data['description'] = video_data['description'].apply(clean_text)
@@ -57,14 +37,6 @@ def preprocess_video_data(video_data, preferred_languages):
 
     # Process tags
     video_data['tags'] = video_data['tags'].apply(process_tags)
-
-    # Filter by language
-    video_data = video_data[video_data['description'].apply(
-        lambda x: filter_language(x, preferred_languages))]
-
-    # Filter out non-educational videos
-    video_data = video_data[video_data.apply(lambda row: is_educational(
-        row['categoryId'], row['combined_text'], row['tags']), axis=1)]
 
     # Handle missing values
     video_data.fillna({'viewCount': 0, 'likeCount': 0,

@@ -2,24 +2,14 @@ const axios = require("axios");
 const Video = require("../models/AggregatedContent");
 require("dotenv").config();
 
-const languageCodes = {
-  swahili: "sw",
-  // Add other languages and their ISO 639-1 codes as needed
-};
-
-const fetchYouTubeData = async (query, language, maxResults = 100) => {
+const fetchYouTubeData = async (query, maxResults = 1000000) => {
   try {
-    // Convert language to valid ISO 639-1 code if necessary
-    const isoLanguage = languageCodes[language.toLowerCase()] || language;
     const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(
       query
-    )}&maxResults=${maxResults}&relevanceLanguage=${isoLanguage}&key=${
-      process.env.YOUTUBE_API_KEY
-    }`;
+    )}&maxResults=${maxResults}&key=${process.env.YOUTUBE_API_KEY}`;
     const response = await axios.get(url);
     return response.data.items.map((item) => ({
       ...item,
-      language: isoLanguage,
     }));
   } catch (error) {
     console.error(`Failed to fetch YouTube data: ${error.message}`);

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { login } from "../redux/actions/authActions";
+import { login } from "../redux/actions/authActions.js";
 import {
   TextField,
   Button,

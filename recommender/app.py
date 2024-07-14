@@ -1,3 +1,4 @@
+# app.py
 from flask import Flask, request, jsonify
 from recommendation import hybrid_recommendations
 from preprocess import preprocess_video_data
@@ -8,21 +9,13 @@ import logging
 import requests
 import json
 
-# Load environment variables from .env file
 load_dotenv(os.path.join(os.getcwd(), '.env'))
 
 app = Flask(__name__)
 
-# Configure logging
 logging.basicConfig(level=logging.DEBUG)
 
-# Load backend URL from environment variables
 BACKEND_URL = os.getenv('BACKEND_URL')
-
-# Preferred languages for filtering videos
-PREFERRED_LANGUAGES = ['en', 'es', 'fr']
-
-# Fetch video data from Node.js backend
 
 
 def fetch_video_data():
@@ -35,12 +28,10 @@ def fetch_video_data():
         else:
             logging.error("Failed to fetch video data: HTTP %s",
                           response.status_code)
-            return pd.DataFrame()  # Return empty DataFrame in case of error
+            return pd.DataFrame()
     except Exception as e:
         logging.error("Error fetching video data: %s", e)
         return pd.DataFrame()
-
-# Fetch user data from Node.js backend
 
 
 def fetch_user_data():
@@ -53,7 +44,7 @@ def fetch_user_data():
         else:
             logging.error("Failed to fetch user data: HTTP %s",
                           response.status_code)
-            return pd.DataFrame()  # Return empty DataFrame in case of error
+            return pd.DataFrame()
     except Exception as e:
         logging.error("Error fetching user data: %s", e)
         return pd.DataFrame()
@@ -72,18 +63,16 @@ def get_recommendations(user_id):
         logging.debug(f"User profile: {user_profile_str}")
         logging.debug(f"Query: {query}")
 
-        # Convert user_profile from JSON string to dict
         user_profile_data = json.loads(user_profile_str)
         user_profile = user_profile_data.get('userProfile', {})
 
-        # Ensure interactions key exists
         if 'interactions' not in user_profile:
             user_profile['interactions'] = []
 
         video_data = fetch_video_data()
         if video_data.empty:
             return jsonify({'error': 'Failed to fetch video data'}), 500
-        video_data = preprocess_video_data(video_data, PREFERRED_LANGUAGES)
+        video_data = preprocess_video_data(video_data)
 
         user_data = fetch_user_data()
         if user_data.empty:

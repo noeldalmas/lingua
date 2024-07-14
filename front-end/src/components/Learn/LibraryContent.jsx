@@ -1,5 +1,6 @@
 // /src/components/Learn/LibraryContent.jsx
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
   Paper,
@@ -11,17 +12,22 @@ import {
   IconButton,
   Slider,
   Typography,
+  CircularProgress,
 } from "@mui/material";
 import {
   Search as SearchIcon,
   ArrowDropDown as ArrowDropDownIcon,
 } from "@mui/icons-material";
-import ContinueStudying from "./ContinueStudying";
-import ForYou from "./ForYou";
-import Topics from "./Topics";
+import LessonCard from "./LessonCard";
+import { searchAndFetchRecommendations } from "../../redux/actions/recommendationActions";
 
 const LibraryContent = () => {
   const [importAnchorEl, setImportAnchorEl] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const dispatch = useDispatch();
+  const { recommendations, loading, error } = useSelector(
+    (state) => state.recommendations
+  );
 
   const handleImportClick = (event) => {
     setImportAnchorEl(event.currentTarget);
@@ -29,6 +35,15 @@ const LibraryContent = () => {
 
   const handleImportClose = () => {
     setImportAnchorEl(null);
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    dispatch(searchAndFetchRecommendations({ query: searchQuery }));
   };
 
   return (
@@ -44,6 +59,7 @@ const LibraryContent = () => {
         <Paper
           component="form"
           sx={{ display: "flex", alignItems: "center", width: 300 }}
+          onSubmit={handleSearchSubmit}
         >
           <IconButton sx={{ p: "10px" }} aria-label="menu">
             <SearchIcon />
@@ -52,6 +68,8 @@ const LibraryContent = () => {
             sx={{ ml: 1, flex: 1 }}
             placeholder="Search…"
             inputProps={{ "aria-label": "search" }}
+            value={searchQuery}
+            onChange={handleSearchChange}
           />
         </Paper>
         <Slider
@@ -90,9 +108,39 @@ const LibraryContent = () => {
           <MenuItem onClick={handleImportClose}>Audio</MenuItem>
         </Menu>
       </Box>
-      <ContinueStudying />
-      <ForYou />
-      <Topics />
+      <Box sx={{ my: 3 }}>
+        <Typography variant="h5" component="div" sx={{ mb: 2 }}>
+          Recommendations
+        </Typography>
+        {loading ? (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              height: "50vh",
+            }}
+          >
+            <CircularProgress />
+          </Box>
+        ) : error ? (
+          <Typography color="error">{error}</Typography>
+        ) : (
+          <Grid container spacing={3}>
+            {recommendations.map((rec) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={rec.videoId}>
+                <LessonCard
+                  videoId={rec.videoId}
+                  title={rec.title}
+                  channelName={rec.channelName}
+                  duration={rec.duration}
+                  score={rec.score}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Box>
     </Box>
   );
 };
