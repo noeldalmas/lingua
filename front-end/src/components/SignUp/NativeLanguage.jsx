@@ -9,21 +9,21 @@ const NativeLanguage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const signUpData = useSelector((state) => state.signUp);
-  const [language, setLanguage] = useState("");
+  const [nativeLanguage, setNativeLanguage] = useState("");
 
   useEffect(() => {
-    setLanguage(signUpData.nativeLanguage);
+    setNativeLanguage(signUpData.nativeLanguage);
   }, [signUpData]);
 
   const [fieldErrors, setFieldErrors] = useState({
-    language: false,
+    nativeLanguage: false,
   });
 
   const validateForm = () => {
     const errors = {};
     let isValid = true;
-    if (!language) {
-      errors.language = true;
+    if (!nativeLanguage) {
+      errors.nativeLanguage = true;
       isValid = false;
     }
     setFieldErrors(errors);
@@ -32,7 +32,7 @@ const NativeLanguage = () => {
 
   const handleContinue = () => {
     if (validateForm()) {
-      dispatch(updateSignUpData({ nativeLanguage: language }));
+      dispatch(updateSignUpData({ nativeLanguage: nativeLanguage }));
       navigate("/signup/daily-goal");
     }
     
@@ -46,13 +46,13 @@ const NativeLanguage = () => {
       <TextField
         select
         label="Choose your native language"
-        value={language}
-        onChange={(e) => setLanguage(e.target.value)}
+        value={nativeLanguage}
+        onChange={(e) => setNativeLanguage(e.target.value)}
         fullWidth
         sx={{ my: 2 }}
         required
-        error={fieldErrors.language}
-        helperText={fieldErrors.language ? "This field is required" : ""}
+        error={fieldErrors.nativeLanguage}
+        helperText={fieldErrors.nativeLanguage ? "This field is required" : ""}
       >
         {["Swahili", "Kikuyu", "Lingala"].map((lang) => (
           <MenuItem key={lang} value={lang}>

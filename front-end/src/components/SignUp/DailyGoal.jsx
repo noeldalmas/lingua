@@ -37,7 +37,7 @@ const DailyGoal = () => {
   const handleContinue = () => {
     if (validateForm()) {
       dispatch(updateSignUpData({ dailyGoal: selectedGoal }));
-      navigate("/signup/import-content");
+      navigate("/signup/topics-you-love");
     }
   };
 

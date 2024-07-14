@@ -24,8 +24,12 @@ const LogIn = () => {
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!formData.email || !formData.password) {
+      return alert("Both email and password are required");
+    }
     dispatch(login(formData));
   };
 

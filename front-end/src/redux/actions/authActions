@@ -8,8 +8,9 @@ export const LOGOUT = "LOGOUT";
 export const REGISTER_SUCCESS = "REGISTER_SUCCESS";
 export const REGISTER_FAIL = "REGISTER_FAIL";
 
-export const login = (email, password) => async (dispatch) => {
+export const login = (formData) => async (dispatch) => {
   try {
+    const { email, password } = formData;
     const response = await axios.post(`${config.BASE_URL}/users/login`, {
       email,
       password,
@@ -20,9 +21,13 @@ export const login = (email, password) => async (dispatch) => {
     });
     localStorage.setItem("token", response.data.token);
   } catch (error) {
+    let errorMessage = "Login failed";
+    if (error.response && error.response.data && error.response.data.message) {
+      errorMessage = error.response.data.message;
+    }
     dispatch({
       type: LOGIN_FAIL,
-      payload: error.response.data.message || "Login failed",
+      payload: errorMessage,
     });
   }
 };

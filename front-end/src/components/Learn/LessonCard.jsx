@@ -24,7 +24,20 @@ import {
   Report,
 } from "@mui/icons-material";
 
-const LessonCard = ({ title, description, imageUrl }) => {
+const LessonCard = ({
+  videoId,
+  title,
+  description,
+  imageUrl,
+  publishedAt,
+  channelName,
+  category,
+  tags,
+  duration,
+  viewCount,
+  likeCount,
+  language,
+}) => {
   const [hover, setHover] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState(null);
 
@@ -50,6 +63,39 @@ const LessonCard = ({ title, description, imageUrl }) => {
         <Typography variant="body2" color="text.secondary">
           {description}
         </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Published on: {new Date(publishedAt).toLocaleDateString()}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Channel: {channelName}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Category: {category}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Duration: {duration}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Views: {viewCount}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Likes: {likeCount}
+        </Typography>
+        <Typography variant="caption" color="text.secondary">
+          Language: {language}
+        </Typography>
+        {tags && tags.length > 0 && (
+          <Box mt={1}>
+            {tags.map((tag) => (
+              <Badge
+                key={tag}
+                color="primary"
+                badgeContent={tag}
+                sx={{ mr: 0.5 }}
+              />
+            ))}
+          </Box>
+        )}
       </CardContent>
       {hover && (
         <Box
@@ -68,18 +114,7 @@ const LessonCard = ({ title, description, imageUrl }) => {
           }}
         >
           <Box>
-            <Badge
-              color="secondary"
-              badgeContent={
-                <img
-                  src="/path/to/youtube_icon.png"
-                  alt="YouTube"
-                  height="20"
-                />
-              }
-            >
-              <Typography variant="body2">647 New Words</Typography>
-            </Badge>
+            <Typography variant="body2">647 New Words</Typography>
             <Typography variant="body2">0 LingQs</Typography>
             <Typography variant="body2">0 Known Words</Typography>
           </Box>

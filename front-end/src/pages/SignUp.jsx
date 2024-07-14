@@ -27,7 +27,7 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const signUpData = useSelector((state) => state.signUp);
   const [formData, setFormData] = useState({
-    languageToLearn: signUpData.language || "",
+    languageToLearn: signUpData.languageToLearn || "",
     level: signUpData.level || "",
     name: signUpData.name || "",
     email: signUpData.email || "",
@@ -39,7 +39,7 @@ const SignUp = () => {
   });
 
   const [fieldErrors, setFieldErrors] = useState({
-    language: false,
+    languageToLearn: false,
     level: false,
     name: false,
     email: false,
@@ -51,7 +51,6 @@ const SignUp = () => {
     const errors = {};
     let isValid = true;
     Object.keys(fieldErrors).forEach((key) => {
-      // Change from formData to fieldErrors
       if (!formData[key]) {
         errors[key] = true;
         isValid = false;
@@ -83,7 +82,6 @@ const SignUp = () => {
 
   const handleCreateAccount = () => {
     if (validateForm()) {
-      // Proceed with account creation
       dispatch(updateSignUpData(formData));
       navigate("/signup/native-language");
     }
@@ -98,7 +96,6 @@ const SignUp = () => {
         console.log("Sign up successful");
         navigate("/learn");
       } else {
-        // This else block might not be necessary if you handle errors in the rejected matcher or with rejectWithValue
         throw new Error("Sign up process failed");
       }
     } catch (error) {
@@ -131,13 +128,15 @@ const SignUp = () => {
                     select
                     label="I want to learn:"
                     margin="normal"
-                    name="language"
-                    value={formData.language}
+                    name="languageToLearn"
+                    value={formData.languageToLearn}
                     onChange={handleInputChange}
                     required
-                    error={fieldErrors.language}
+                    error={fieldErrors.languageToLearn}
                     helperText={
-                      fieldErrors.language ? "This field is required" : ""
+                      fieldErrors.languageToLearn
+                        ? "This field is required"
+                        : ""
                     }
                   >
                     {languages.map((lang) => (

@@ -9,7 +9,6 @@ export const updateSignUpData = (data) => (dispatch) => {
   dispatch(setSignUpData(data));
 };
 
-// Refactor completeSignUp to use createAsyncThunk
 export const completeSignUp = createAsyncThunk(
   "users/completeSignUp",
   async (data, { rejectWithValue, dispatch }) => {
@@ -19,7 +18,8 @@ export const completeSignUp = createAsyncThunk(
         `${config.BASE_URL}/users/register`,
         data
       );
-      if (response.status !== 200) {
+      if (response.status !== 201) {
+        // Adjusted to match backend success status
         throw new Error("Registration failed with status: " + response.status);
       }
       console.log("Registration successful with response:", response.data);
